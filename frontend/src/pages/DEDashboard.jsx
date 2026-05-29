@@ -5,6 +5,33 @@ import {
   CheckCircle, AlertCircle, FileText, ChevronRight, XCircle, Info 
 } from 'lucide-react';
 
+// Helper to generate a dynamic list of financial years
+export function generateFinancialYears(pastCount = 2, futureCount = 5) {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0-indexed (Jan is 0, Apr is 3)
+  
+  // Financial year runs from April 1st to March 31st
+  const baseYear = currentMonth >= 3 ? currentYear : currentYear - 1;
+  
+  const years = [];
+  for (let i = -pastCount; i <= futureCount; i++) {
+    const startYear = baseYear + i;
+    const endYearString = String(startYear + 1).slice(-2);
+    years.push(`${startYear}-${endYearString}`);
+  }
+  return years;
+}
+
+export function getCurrentFinancialYear() {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
+  const baseYear = currentMonth >= 3 ? currentYear : currentYear - 1;
+  const endYearString = String(baseYear + 1).slice(-2);
+  return `${baseYear}-${endYearString}`;
+}
+
 export default function DEDashboard() {
   const { token, user } = useAuth();
   const [entries, setEntries] = useState([]);
@@ -19,7 +46,7 @@ export default function DEDashboard() {
   // Form Fields State
   const initialFormState = {
     scheme: '',
-    year: '2025-26',
+    year: getCurrentFinancialYear(),
     go_details: '',
     technical_sanction: '',
     admin_sanction_value: '',
@@ -413,12 +440,9 @@ export default function DEDashboard() {
                   className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-600/10"
                   required
                 >
-                  <option value="2024-25">2024-25</option>
-                  <option value="2025-26">2025-26</option>
-                  <option value="2026-27">2026-27</option>
-                  <option value="2027-28">2027-28</option>
-                  <option value="2028-29">2028-29</option>
-                  <option value="2029-30">2029-30</option>
+                  {generateFinancialYears().map(fy => (
+                    <option key={fy} value={fy}>{fy}</option>
+                  ))}
                 </select>
               </div>
 
